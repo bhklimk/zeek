@@ -3518,6 +3518,8 @@ type dns_soa: record {
 ##
 ## .. bro:see:: dns_EDNS_addl
 type dns_edns_additional: record {
+	##TODO BHK needs updating 
+	is_query: count;	##< TODO. BHK moved toward top to support additional processing
 	query: string;	##< Query.
 	qtype: count;	##< Query type.
 	t: count;	##< TODO.
@@ -3526,7 +3528,7 @@ type dns_edns_additional: record {
 	version: count;	##< Version.
 	z_field: count;	##< TODO.
 	TTL: interval;	##< Time-to-live.
-	is_query: count;	##< TODO.
+	opt_type: count; ##TODO BHK added
 };
 
 ## An additional DNS TSIG record.

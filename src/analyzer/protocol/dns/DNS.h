@@ -124,9 +124,11 @@ struct EDNS_ADDITIONAL {		// size
 	unsigned short extended_rcode;	// 8
 	unsigned short version;		// 8
 	unsigned short z;		// 16
-	unsigned short rdata_len;	// 16
+	unsigned short rdata_len;// 16
+	unsigned short opt_code;//16 TODO BHK
 };
-
+//TODO BHK need ECS record
+//https://tools.ietf.org/html/rfc7871#page-7
 struct TSIG_DATA {
 	BroString* alg_name;
 	unsigned long time_s;
@@ -181,7 +183,7 @@ public:
 
 	Val* BuildHdrVal();
 	Val* BuildAnswerVal();
-	Val* BuildEDNS_Val();
+	Val* BuildEDNS_Val(unsigned int opt_code);
 	Val* BuildTSIG_Val();
 	Val* BuildRRSIG_Val(struct RRSIG_DATA*);
 	Val* BuildDNSKEY_Val(struct DNSKEY_DATA*);
@@ -373,6 +375,6 @@ protected:
 // FIXME: Doesn't really fit into new analyzer structure. What to do?
 int IsReuse(double t, const u_char* pkt);
 
-} } // namespace analyzer::* 
+} } // namespace analyzer::*
 
 #endif
