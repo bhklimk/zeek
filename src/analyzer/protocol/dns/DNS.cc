@@ -752,6 +752,8 @@ int DNS_Interpreter::ParseRR_EDNS(DNS_MsgInfo* msg,
 
 	cout<<"Hi ParseRR_EDNS \n";
     //TODO dns_EDNS_addl resolves to false
+	unsigned int opt_code=0;
+
 	if ( 1 )
 //	if ( dns_EDNS_addl && ! msg->skip_event )
 		{
@@ -759,7 +761,7 @@ int DNS_Interpreter::ParseRR_EDNS(DNS_MsgInfo* msg,
 		val_list* vl = new val_list;
         //Get opt_code; note header for OPT RR info parsed in parsedAnswers
         //Regardless of the implementation the OPT RR for EDNS has a opt_code
-        unsigned int opt_code=ExtractShort(data,len);
+        opt_code=ExtractShort(data,len);
         rdlength-=2;//clean up rdlen
         //cout<<"rdlen "<<rdlength<<"\n";
         //cout<<"optcode "<<opt_code<<"\n";
@@ -773,6 +775,25 @@ int DNS_Interpreter::ParseRR_EDNS(DNS_MsgInfo* msg,
 	// Currently EDNS supports the movement of type:data pairs
 	// in the RR_DATA section.  Here's where we should put together
 	// a corresponding mechanism.
+
+
+	switch ( EDNS_OPT_CODE(opt_code) ) {
+		case OPT_EDNS_ECS:
+			ParseRR_EDNS_ECS(msg, data, len, rdlength, msg_start);
+			break;
+        /*case OPT_EDNS_DNSSEC:
+			status = ParseRR_EDNS_DNSSEC(msg, data, len, rdlength);
+			break;
+        case OPT_EDNS_CHAIN:
+			status = ParseRR_EDNS_CHAINsa(msg, data, len, rdlength);
+			break;
+        case OPT_EDNS_CHAIN:
+			status = ParseRR_EDNS_ECS(msg, data, len, rdlength);
+			break;*/
+		default:
+            //Defaults
+			break;
+	}
 	if ( rdlength > 0 )
 		{ // deal with data
 		data += rdlength;
@@ -782,6 +803,26 @@ int DNS_Interpreter::ParseRR_EDNS(DNS_MsgInfo* msg,
 	return 1;
 	}
 
+int DNS_Interpreter::ParseRR_EDNS_ECS(DNS_MsgInfo* msg,
+				const u_char*& data, int& len, int rdlength,
+				const u_char* msg_start)
+	{
+        cout<<"ParseRR_EDNS_ECS\n";
+        unsigned int opt_len=ExtractShort(data,len);
+        unsigned int family=ExtractShort(data,len);
+        unsigned int masks=ExtractShort(data,len);
+        unsigned int sub_mask=(masks >> 16) & 0xffff;
+        unsigned int scope_mask=masks & 0xffff;
+        uint32 addr = ExtractLong(data, len);
+		//vl->append(new AddrVal(htonl(addr)));
+        //TODO pass reference object into record
+		val_list* vl = new val_list;
+		vl->append(analyzer->BuildConnVal());
+		vl->append(msg->BuildHdrVal());
+		vl->append(msg->BuildEDNS_ECS_Val(ECS_IPv4));
+		analyzer->ConnectionEvent(dns_EDNS_ECS_addl, vl);
+        return 1;
+	}
 void DNS_Interpreter::ExtractOctets(const u_char*& data, int& len,
                                     BroString** p)
 	{
@@ -1264,6 +1305,7 @@ int DNS_Interpreter::ParseRR_A(DNS_MsgInfo* msg,
 		vl->append(msg->BuildAnswerVal());
 		vl->append(new AddrVal(htonl(addr)));
 
+
 		analyzer->ConnectionEvent(dns_A_reply, vl);
 		}
 
@@ -1552,7 +1594,7 @@ Val* DNS_MsgInfo::BuildEDNS_Val(unsigned int opt_code)
 	r->Assign(5, val_mgr->GetCount(return_error));
 	r->Assign(6, val_mgr->GetCount(version));
 	r->Assign(7, val_mgr->GetCount(z));
-	r->Assign(8, new IntervalVal(double(ttl), Seconds));
+1	r->Assign(8, new IntervalVal(double(ttl), Seconds));
     r->Assign(9, val_mgr->GetCount(opt_code));
     //cout<<"version "<<version<<"\n";
     //printf("\tquery_name= \"%s\"\n", (r->Lookup(1))->AsStringVal()->CheckString());//TODO
@@ -1560,6 +1602,36 @@ Val* DNS_MsgInfo::BuildEDNS_Val(unsigned int opt_code)
 
 	return r;
 	}
+
+Val* DNS_MsgInfo::BuildEDNS_ECS_Val()
+	{
+	// TODO expand to IPv6!!!!
+	RecordVal* r = new RecordVal(dns_edns_ecs_additional);
+	Ref(query_name);
+	r->Assign(0, val_mgr->GetCount(is_query));
+	//BHK moved to top to support additional information parsing
+
+
+
+	// sender's UDP payload size, per RFC 2671 4.3
+	r->Assign(4, val_mgr->GetCount(aclass));
+
+	// Need to break the TTL field into three components:
+	// initial: [------------- ttl (32) ---------------------]
+	// after:   [ ext rcode (8)][ver # (8)][   Z field (16)  ]
+
+	unsigned int ercode = (ttl >> 24) & 0xff;
+	unsigned int version = (ttl >> 16) & 0xff;
+	// unsigned int DO = ttl & 0x8000;	// "DNSSEC OK" - RFC 3225
+	unsigned int z = ttl & 0xffff;
+
+	unsigned int return_error = (ercode << 8) | rcode;
+
+	r->Assign(5, val_mgr->GetCount(return_error));
+	r->Assign(6, val_mgr->GetCount(version));
+	return r;
+	}
+
 
 Val* DNS_MsgInfo::BuildTSIG_Val()
 	{

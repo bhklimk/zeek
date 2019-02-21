@@ -114,6 +114,7 @@ RecordType* dns_msg;
 RecordType* dns_answer;
 RecordType* dns_soa;
 RecordType* dns_edns_additional;
+RecordType* dns_edns_ecs_additional;
 RecordType* dns_tsig_additional;
 RecordType* dns_rrsig_rr;
 RecordType* dns_dnskey_rr;
@@ -432,6 +433,9 @@ void init_net_var()
 	dns_soa = internal_type("dns_soa")->AsRecordType();
 	dns_edns_additional =
 		internal_type("dns_edns_additional")->AsRecordType();
+	dns_edns_ecs_additional =
+		internal_type("dns_edns_ecs_additional")->AsRecordType();
+
 	dns_tsig_additional =
 		internal_type("dns_tsig_additional")->AsRecordType();
 	dns_rrsig_rr = internal_type("dns_rrsig_rr")->AsRecordType();

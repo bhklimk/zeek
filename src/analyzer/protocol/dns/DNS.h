@@ -127,6 +127,34 @@ struct EDNS_ADDITIONAL {		// size
 	unsigned short rdata_len;// 16
 	unsigned short opt_code;//16 TODO BHK
 };
+
+typedef enum {
+	//https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-11
+	OPT_EDNS_RESERVED = 0,
+	OPT_EDNS_LLQ = 1,
+	OPT_EDNS_UL = 2,
+    OPT_EDNS_NSID = 3,
+    OPT_EDNS_RSV_OWNER_OPT = 4,
+    OPT_EDNS_DAU = 5,
+    OPT_EDNS_DHU = 6,
+    OPT_EDNS_N3U = 7,
+    OPT_EDNS_ECS = 8,
+    OPT_EDNS_EXPIRE = 9,
+    OPT_EDNS_COOKIE = 10,
+	OPT_EDNS_TCP_KEEPALIVE=11,
+    OPT_EDNS_PADDING = 12,
+	OPT_EDNS_CHAIN = 13,
+	OPT_EDNS_TAG = 14,
+    OPT_EDNS_DEVICEID = 26946,
+    OPT_EDNS_FUTURE= 65535,
+/*
+15-26945	Unassigned
+26947-65000	Unassigned
+65001-65534	Reserved for Local/Experimental Use		[RFC6891]
+65535	Reserved for future expansion		[RFC6891]
+*/
+} EDNS_OPT_CODE;
+
 //TODO BHK need ECS record
 //https://tools.ietf.org/html/rfc7871#page-7
 struct TSIG_DATA {
@@ -277,6 +305,9 @@ protected:
 	int ParseRR_EDNS(DNS_MsgInfo* msg,
 				const u_char*& data, int& len, int rdlength,
 				const u_char* msg_start);
+    int ParseRR_EDNS_ECS(DNS_MsgInfo* msg,
+				const u_char*& data, int& len, int rdlength,
+				const u_char* msg_start);
 	int ParseRR_A(DNS_MsgInfo* msg,
 				const u_char*& data, int& len, int rdlength);
 	int ParseRR_AAAA(DNS_MsgInfo* msg,
@@ -323,6 +354,8 @@ typedef enum {
 	DNS_LEN_LO,		///< looking for the low-order byte of the length
 	DNS_MESSAGE_BUFFER,	///< building up the message in the buffer
 } TCP_DNS_state;
+
+
 
 // Support analyzer which chunks the TCP stream into "packets".
 // ### This should be merged with TCP_Contents_RPC.

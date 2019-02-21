@@ -308,7 +308,7 @@ hook DNS::do_reply(c: connection, msg: dns_msg, ans: dns_answer, reply: string) 
 		if ( ! c$dns?$rtt )
 			{
 			c$dns$rtt = network_time() - c$dns$ts;
-			# This could mean that only a reply was seen since 
+			# This could mean that only a reply was seen since
 			# we assume there must be some passage of time between
 			# request and response.
 			if ( c$dns$rtt == 0secs )
@@ -462,6 +462,15 @@ event dns_EDNS_addl(c: connection, msg: dns_msg, ans: dns_edns_additional)
 	print "dns_EDNS_addl ", ans;
 
 	}
+event dns_EDNS_ECS_addl(c: connection, msg: dns_msg, ans: dns_edns_ecs_additional)
+	{
+	#print "c ", c;
+	print "dns_EDNS_ECS_addl ", ans;
+
+	}
+
+
+
 #
 #event dns_TSIG_addl(c: connection, msg: dns_msg, ans: dns_tsig_additional)
 #	{
