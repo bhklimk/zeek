@@ -3531,7 +3531,31 @@ type dns_edns_additional: record {
 	opt_type: count; ##TODO BHK added
 };
 
+type dns_edns_ecs_additional: record {
 
+    ##//https://tools.ietf.org/html/rfc7871#page-7
+
+    ##    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+    ## 0: |                          OPTION-CODE                          |
+    ##    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+    ## 2: |                         OPTION-LENGTH                         |
+    ##    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+    ## 4: |                            FAMILY                             |
+    ##    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+    ## 6: |     SOURCE PREFIX-LENGTH      |     SCOPE PREFIX-LENGTH       |
+    ##    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+    ## 8: |                           ADDRESS...                          /
+    ##    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+	##TODO BHK needs updating
+	opt_code: count;	##0
+	opt_len: count; 	##1
+	family: count;      ##2
+	src_pre_len:count;  ##3
+	scp_pre_len:count;  ##4
+    ecs_addr: addr;     ##5
+
+	};
 
 ## An additional DNS TSIG record.
 ##

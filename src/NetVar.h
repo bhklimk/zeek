@@ -117,7 +117,7 @@ extern RecordType* dns_msg;
 extern RecordType* dns_answer;
 extern RecordType* dns_soa;
 extern RecordType* dns_edns_additional;
-extern RecordType* dns_edns_ecs_additional
+extern RecordType* dns_edns_ecs_additional;
 extern RecordType* dns_tsig_additional;
 extern RecordType* dns_rrsig_rr;
 extern RecordType* dns_dnskey_rr;

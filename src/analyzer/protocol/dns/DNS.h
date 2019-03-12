@@ -129,6 +129,7 @@ struct EDNS_ADDITIONAL {		// size
 };
 
 typedef enum {
+    //BHK
 	//https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-11
 	OPT_EDNS_RESERVED = 0,
 	OPT_EDNS_LLQ = 1,
@@ -212,6 +213,9 @@ public:
 	Val* BuildHdrVal();
 	Val* BuildAnswerVal();
 	Val* BuildEDNS_Val(unsigned int opt_code);
+	Val * BuildEDNS_ECS_Val(int opt_len, int family,
+                                    int sub_mask, int scope_mask,
+                                    AddrVal * addr);
 	Val* BuildTSIG_Val();
 	Val* BuildRRSIG_Val(struct RRSIG_DATA*);
 	Val* BuildDNSKEY_Val(struct DNSKEY_DATA*);

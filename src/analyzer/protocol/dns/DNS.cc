@@ -25,14 +25,14 @@ DNS_Interpreter::DNS_Interpreter(analyzer::Analyzer* arg_analyzer)
 int DNS_Interpreter::ParseMessage(const u_char* data, int len, int is_query)
 	{
 	int hdr_len = sizeof(DNS_RawMsgHdr);
-	cout<<"+++++++++++++++++\n";
+	////cout<<"+++++++++++++++++\n";
 	if ( len < hdr_len )
 		{
 		analyzer->Weird("DNS_truncated_len_lt_hdr_len");
-		cout<<"+++++++++++++++++\n";
+		////cout<<"+++++++++++++++++\n";
 		return 0;
 		}
-    cout<<"ParseMessage Woot!!!!\n";
+    ////cout<<"ParseMessage Woot!!!!\n";
     //TODO https://stackoverflow.com/questions/37618040/codeblocks-with-cmake
 
 	DNS_MsgInfo msg((DNS_RawMsgHdr*) data, is_query);
@@ -65,7 +65,7 @@ int DNS_Interpreter::ParseMessage(const u_char* data, int len, int is_query)
 		analyzer->ProtocolViolation("DNS_Conn_count_too_large");
 		analyzer->Weird("DNS_Conn_count_too_large");
 		EndMessage(&msg);
-		cout<<"+++++++++++++++++\n";
+		////cout<<"+++++++++++++++++\n";
 		return 0;
 		}
 
@@ -78,8 +78,8 @@ int DNS_Interpreter::ParseMessage(const u_char* data, int len, int is_query)
 		{
 		EndMessage(&msg);
 		//TODO is it short circuiting here?
-		cout<<"ParseMessage ParseQuestions return\n";
-		cout<<"+++++++++++++++++\n";
+		////cout<<"ParseMessage ParseQuestions return\n";
+		////cout<<"+++++++++++++++++\n";
 		return 0;
 		}
 
@@ -88,11 +88,11 @@ int DNS_Interpreter::ParseMessage(const u_char* data, int len, int is_query)
 		{
 
 		EndMessage(&msg);
-		cout<<"ParseMessage ParseAnswers return\n";
-        cout<<"+++++++++++++++++\n";
+		////cout<<"ParseMessage ParseAnswers return\n";
+        ////cout<<"+++++++++++++++++\n";
 		return 0;
 		}
-    cout<<"Fall through?\n";
+    ////cout<<"Fall through?\n";
 
 	analyzer->ProtocolConfirmation();
 
@@ -110,17 +110,17 @@ int DNS_Interpreter::ParseMessage(const u_char* data, int len, int is_query)
 		skip_addl = skip_addl || msg.arcount == 0 ||
 				dns_skip_addl->Lookup(&server);
 		}
-    cout<<"msg.ancount "<<msg.ancount <<"\n";
-    //cout<<"skip_auth "<<skip_auth <<"\n";
-    //cout<<"skip_addl  "<<skip_addl  <<"\n";
+    ////cout<<"msg.ancount "<<msg.ancount <<"\n";
+    ////cout<<"skip_auth "<<skip_auth <<"\n";
+    ////cout<<"skip_addl  "<<skip_addl  <<"\n";
 
 
 	if ( skip_auth && skip_addl )
 		{
 		// No point doing further work parsing the message.
-		cout<<"No point doing further work parsing the message\n";
+		////cout<<"No point doing further work parsing the message\n";
 		EndMessage(&msg);
-		cout<<"+++++++++++++++++\n";
+		////cout<<"+++++++++++++++++\n";
 		return 1;
 		}
 
@@ -128,9 +128,9 @@ int DNS_Interpreter::ParseMessage(const u_char* data, int len, int is_query)
 	if ( ! ParseAnswers(&msg, msg.nscount, DNS_AUTHORITY,
 				data, len, msg_start) )
 		{
-        cout<<"second parseAnswers call\n";
+        ////cout<<"second parseAnswers call\n";
 		EndMessage(&msg);
-		cout<<"+++++++++++++++++\n";
+		////cout<<"+++++++++++++++++\n";
 		return 0;
 		}
 
@@ -138,7 +138,7 @@ int DNS_Interpreter::ParseMessage(const u_char* data, int len, int is_query)
 		{
 		// No point doing further work parsing the message.
 		EndMessage(&msg);
-		cout<<"+++++++++++++++++\n";
+		////cout<<"+++++++++++++++++\n";
 		return 1;
 		}
 	//TODO this assignment seems to be causing trouble
@@ -146,14 +146,14 @@ int DNS_Interpreter::ParseMessage(const u_char* data, int len, int is_query)
 	if ( ! ParseAnswers(&msg, msg.arcount, DNS_ADDITIONAL,
 				data, len, msg_start) )
 		{
-        cout<<"third parseAnswers call\n";
+        ////cout<<"third parseAnswers call\n";
 		EndMessage(&msg);
-		cout<<"+++++++++++++++++\n";
+		////cout<<"+++++++++++++++++\n";
 		return 0;
 		}
 
 	EndMessage(&msg);
-	cout<<"+++++++++++++++++\n";
+	//cout<<"+++++++++++++++++\n";
 	return 1;
 
 	}
@@ -273,58 +273,58 @@ int DNS_Interpreter::ParseAnswer(DNS_MsgInfo* msg,
 		}
 
 	int status;
-	cout<<"============================================\n";
-	//cout<<( msg->query_name )<<"\n";
+	//cout<<"============================================\n";
+	////cout<<( msg->query_name )<<"\n";
 	msg->skip_event=1;//TODO dont know why it it is mutated back to 0
-	cout<<( msg->atype )<<" | "<<(msg->skip_event)<<"\n";
+	//cout<<( msg->atype )<<" | "<<(msg->skip_event)<<"\n";
 	//It doesnt appear that the message parses additional records!!!!
 	switch ( msg->atype ) {
 		case TYPE_A:
-			cout<<"hi case type_a\n";
+			//cout<<"hi case type_a\n";
 			status = ParseRR_A(msg, data, len, rdlength);
 			break;
 		case TYPE_A6:
 		case TYPE_AAAA:
-			cout<<"hi case type_aaaa\n";
+			//cout<<"hi case type_aaaa\n";
 			status = ParseRR_AAAA(msg, data, len, rdlength);
 			break;
 		case TYPE_NS:
 		case TYPE_CNAME:
 		case TYPE_PTR:
-			cout<<"hi case type_ptr\n";
+			//cout<<"hi case type_ptr\n";
 			status = ParseRR_Name(msg, data, len, rdlength, msg_start);
 			break;
 		case TYPE_SOA:
-			cout<<"hi case type_SOA\n";
+			//cout<<"hi case type_SOA\n";
 			status = ParseRR_SOA(msg, data, len, rdlength, msg_start);
 			break;
 		case TYPE_WKS:
-			cout<<"hi case type_wks\n";
+			//cout<<"hi case type_wks\n";
 			status = ParseRR_WKS(msg, data, len, rdlength);
 			break;
 		case TYPE_HINFO:
-			cout<<"hi case type_hinfo\n";
+			//cout<<"hi case type_hinfo\n";
 			status = ParseRR_HINFO(msg, data, len, rdlength);
 			break;
 
 		case TYPE_MX:
-			cout<<"hi case type_mx\n";
+			//cout<<"hi case type_mx\n";
 			status = ParseRR_MX(msg, data, len, rdlength, msg_start);
 			break;
 		case TYPE_TXT:
-			cout<<"hi case type_txt\n";
+			//cout<<"hi case type_txt\n";
 			status = ParseRR_TXT(msg, data, len, rdlength, msg_start);
 			break;
 		case TYPE_CAA:
-			cout<<"hi case type_caa\n";
+			//cout<<"hi case type_caa\n";
 			status = ParseRR_CAA(msg, data, len, rdlength, msg_start);
 			break;
 		case TYPE_NBS:
-			cout<<"hi case type_nbs\n";
+			//cout<<"hi case type_nbs\n";
 			status = ParseRR_NBS(msg, data, len, rdlength, msg_start);
 			break;
 		case TYPE_SRV:
-			cout<<"hi case type_srv\n";
+			//cout<<"hi case type_srv\n";
 			if ( ntohs(analyzer->Conn()->RespPort()) == 137 )
 				{
 				// This is an NBSTAT (NetBIOS NODE STATUS) record.
@@ -338,42 +338,42 @@ int DNS_Interpreter::ParseAnswer(DNS_MsgInfo* msg,
 			break;
 
 		case TYPE_EDNS:
-			cout<<"hi case type_edns\n";
+			//cout<<"hi case type_edns\n";
 			status = ParseRR_EDNS(msg, data, len, rdlength, msg_start);
 			break;
 
 		case TYPE_TSIG:
-			cout<<"hi case type_tsig\n";
+			//cout<<"hi case type_tsig\n";
 			status = ParseRR_TSIG(msg, data, len, rdlength, msg_start);
 			break;
 
 		case TYPE_RRSIG:
-			cout<<"hi case type_rrsig\n";
+			//cout<<"hi case type_rrsig\n";
 			status = ParseRR_RRSIG(msg, data, len, rdlength, msg_start);
 			break;
 
 		case TYPE_DNSKEY:
-			cout<<"hi case type_dnskey\n";
+			//cout<<"hi case type_dnskey\n";
 			status = ParseRR_DNSKEY(msg, data, len, rdlength, msg_start);
 			break;
 
 		case TYPE_NSEC:
-			cout<<"hi case type_nsec\n";
+			//cout<<"hi case type_nsec\n";
 			status = ParseRR_NSEC(msg, data, len, rdlength, msg_start);
 			break;
 
 		case TYPE_NSEC3:
-			cout<<"hi case type_nsec3\n";
+			//cout<<"hi case type_nsec3\n";
 			status = ParseRR_NSEC3(msg, data, len, rdlength, msg_start);
 			break;
 
 		case TYPE_DS:
-			cout<<"hi case TYPE_DS\n";
+			//cout<<"hi case TYPE_DS\n";
 			status = ParseRR_DS(msg, data, len, rdlength, msg_start);
 			break;
 
 		default:
-			cout<<"case default\n";
+			//cout<<"case default\n";
 
 			if ( dns_unknown_reply && ! msg->skip_event )
 				{
@@ -750,21 +750,21 @@ int DNS_Interpreter::ParseRR_EDNS(DNS_MsgInfo* msg,
 	// We need a pair-value set mechanism here to dump useful information
 	// out to the policy side of the house if rdlength > 0.
 
-	cout<<"Hi ParseRR_EDNS \n";
+	//cout<<"Hi ParseRR_EDNS \n";
     //TODO dns_EDNS_addl resolves to false
 	unsigned int opt_code=0;
 
 	if ( 1 )
 //	if ( dns_EDNS_addl && ! msg->skip_event )
 		{
-        cout<<"ParseRR_EDNS inside if block\n";
+        //cout<<"ParseRR_EDNS inside if block\n";
 		val_list* vl = new val_list;
         //Get opt_code; note header for OPT RR info parsed in parsedAnswers
         //Regardless of the implementation the OPT RR for EDNS has a opt_code
         opt_code=ExtractShort(data,len);
         rdlength-=2;//clean up rdlen
-        //cout<<"rdlen "<<rdlength<<"\n";
-        //cout<<"optcode "<<opt_code<<"\n";
+        ////cout<<"rdlen "<<rdlength<<"\n";
+        ////cout<<"optcode "<<opt_code<<"\n";
         //TODO BHK need to create a method to parse out ECS subnet info
 		vl->append(analyzer->BuildConnVal());
 		vl->append(msg->BuildHdrVal());
@@ -807,19 +807,23 @@ int DNS_Interpreter::ParseRR_EDNS_ECS(DNS_MsgInfo* msg,
 				const u_char*& data, int& len, int rdlength,
 				const u_char* msg_start)
 	{
-        cout<<"ParseRR_EDNS_ECS\n";
+        ////cout<<"ParseRR_EDNS_ECS\n";
         unsigned int opt_len=ExtractShort(data,len);
         unsigned int family=ExtractShort(data,len);
+        ////cout<<"Family "<<family<<"\n";
         unsigned int masks=ExtractShort(data,len);
-        unsigned int sub_mask=(masks >> 16) & 0xffff;
-        unsigned int scope_mask=masks & 0xffff;
+        unsigned int sub_mask=(masks >> 8) & 0xff;
+        unsigned int scope_mask=masks & 0xff;
         uint32 addr = ExtractLong(data, len);
+		AddrVal * ECS_IPv4 = new AddrVal(htonl(addr));
+		////cout<<"IPv4 "<<addr<<"\n";
 		//vl->append(new AddrVal(htonl(addr)));
         //TODO pass reference object into record
 		val_list* vl = new val_list;
 		vl->append(analyzer->BuildConnVal());
 		vl->append(msg->BuildHdrVal());
-		vl->append(msg->BuildEDNS_ECS_Val(ECS_IPv4));
+		vl->append(msg->BuildEDNS_ECS_Val(opt_len, family, sub_mask,
+                                    scope_mask, ECS_IPv4));
 		analyzer->ConnectionEvent(dns_EDNS_ECS_addl, vl);
         return 1;
 	}
@@ -1297,7 +1301,7 @@ int DNS_Interpreter::ParseRR_A(DNS_MsgInfo* msg,
 	if ( dns_A_reply  )
 		{
         //TODO Seems like the mutation issue short circuits this block
-		cout<<"Inside if block RR_A\n";
+		//cout<<"Inside if block RR_A\n";
 		val_list* vl = new val_list;
 
 		vl->append(analyzer->BuildConnVal());
@@ -1594,41 +1598,39 @@ Val* DNS_MsgInfo::BuildEDNS_Val(unsigned int opt_code)
 	r->Assign(5, val_mgr->GetCount(return_error));
 	r->Assign(6, val_mgr->GetCount(version));
 	r->Assign(7, val_mgr->GetCount(z));
-1	r->Assign(8, new IntervalVal(double(ttl), Seconds));
+	r->Assign(8, new IntervalVal(double(ttl), Seconds));
     r->Assign(9, val_mgr->GetCount(opt_code));
-    //cout<<"version "<<version<<"\n";
+    ////cout<<"version "<<version<<"\n";
     //printf("\tquery_name= \"%s\"\n", (r->Lookup(1))->AsStringVal()->CheckString());//TODO
     //printf("\tquery_name= \"%s\"\n", (r->Lookup(1))->AsString()->CheckString());//TODO
 
 	return r;
 	}
 
-Val* DNS_MsgInfo::BuildEDNS_ECS_Val()
+Val* DNS_MsgInfo::BuildEDNS_ECS_Val(int opt_len, int family,
+                                    int sub_mask, int scope_mask,
+                                    AddrVal * addr)
 	{
 	// TODO expand to IPv6!!!!
 	RecordVal* r = new RecordVal(dns_edns_ecs_additional);
 	Ref(query_name);
-	r->Assign(0, val_mgr->GetCount(is_query));
-	//BHK moved to top to support additional information parsing
+	/*
+    opt_code: count;	##0
+	opt_len: count; 	##1
+	family: count;      ##2
+	src_pre_len:count;  ##3
+	scp_pre_len:count;  ##4
+    ecs_addr: addr;     ##5
+
+	*/
+
+    r->Assign(1, val_mgr->GetCount(opt_len));
+    r->Assign(2, val_mgr->GetCount(family));
+    r->Assign(3, val_mgr->GetCount(sub_mask));
+    r->Assign(4, val_mgr->GetCount(scope_mask));
+	r->Assign(5, addr);
 
 
-
-	// sender's UDP payload size, per RFC 2671 4.3
-	r->Assign(4, val_mgr->GetCount(aclass));
-
-	// Need to break the TTL field into three components:
-	// initial: [------------- ttl (32) ---------------------]
-	// after:   [ ext rcode (8)][ver # (8)][   Z field (16)  ]
-
-	unsigned int ercode = (ttl >> 24) & 0xff;
-	unsigned int version = (ttl >> 16) & 0xff;
-	// unsigned int DO = ttl & 0x8000;	// "DNSSEC OK" - RFC 3225
-	unsigned int z = ttl & 0xffff;
-
-	unsigned int return_error = (ercode << 8) | rcode;
-
-	r->Assign(5, val_mgr->GetCount(return_error));
-	r->Assign(6, val_mgr->GetCount(version));
 	return r;
 	}
 

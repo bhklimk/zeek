@@ -453,13 +453,13 @@ event dns_SRV_reply(c: connection, msg: dns_msg, ans: dns_answer, target: string
 # TODO: figure out how to handle these  BHK DOIN IT!
 event dns_EDNS(c: connection, msg: dns_msg, ans: dns_answer)
 	{
-	print "dns_EDNS\n";
+	#print "dns_EDNS\n";
 	}
 #
 event dns_EDNS_addl(c: connection, msg: dns_msg, ans: dns_edns_additional)
 	{
-	print "c ", c;
-	print "dns_EDNS_addl ", ans;
+	#print "c ", c;
+	#print "dns_EDNS_addl ", ans;
 
 	}
 event dns_EDNS_ECS_addl(c: connection, msg: dns_msg, ans: dns_edns_ecs_additional)
